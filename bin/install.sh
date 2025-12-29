@@ -4,6 +4,11 @@
 
 set -e
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Go to the project root (one level up from bin/)
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 EXTENSION_UUID="nowa-desktop@extensions.gnome.org"
 EXTENSION_DIR="$HOME/.local/share/gnome-shell/extensions/$EXTENSION_UUID"
 SCHEMA_DIR="$EXTENSION_DIR/schemas"
@@ -27,18 +32,18 @@ fi
 mkdir -p "$EXTENSION_DIR"
 mkdir -p "$SCHEMA_DIR"
 
-# Step 3: Copy extension files
-cp extension.js "$EXTENSION_DIR/"
-cp metadata.json "$EXTENSION_DIR/"
-cp stylesheet.css "$EXTENSION_DIR/"
-cp prefs.js "$EXTENSION_DIR/"
-cp -r modules "$EXTENSION_DIR/"
-cp -r services "$EXTENSION_DIR/"
-cp -r utils "$EXTENSION_DIR/"
-cp -r assets "$EXTENSION_DIR/"
+# Step 3: Copy extension files from project root
+cp "$PROJECT_ROOT/extension.js" "$EXTENSION_DIR/"
+cp "$PROJECT_ROOT/metadata.json" "$EXTENSION_DIR/"
+cp "$PROJECT_ROOT/stylesheet.css" "$EXTENSION_DIR/"
+cp "$PROJECT_ROOT/prefs.js" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/modules" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/services" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/utils" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/assets" "$EXTENSION_DIR/"
 
 # Step 4: Copy and compile schema
-cp schemas/org.gnome.shell.extensions.nowa-desktop.gschema.xml "$SCHEMA_DIR/"
+cp "$PROJECT_ROOT/schemas/org.gnome.shell.extensions.nowa-desktop.gschema.xml" "$SCHEMA_DIR/"
 
 cd "$SCHEMA_DIR"
 glib-compile-schemas . 2>&1
