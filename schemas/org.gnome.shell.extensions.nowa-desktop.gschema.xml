@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.nowa-desktop" path="/org/gnome/shell/extensions/nowa-desktop/">
+    
+    <key name="panel-mode" type="s">
+      <default>'automatic'</default>
+      <summary>Panel mode</summary>
+      <description>Panel appearance mode: automatic, dark, light, translucent-dark, translucent-light</description>
+      <choices>
+        <choice value='automatic'/>
+        <choice value='dark'/>
+        <choice value='light'/>
+        <choice value='translucent-dark'/>
+        <choice value='translucent-light'/>
+      </choices>
+    </key>
+
+    <key name="luminance-threshold" type="d">
+      <default>0.575</default>
+      <summary>Luminance threshold</summary>
+      <description>Threshold to determine if background is dark or light (0.0 to 1.0)</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+
+    <key name="corner-radius" type="i">
+      <default>6</default>
+      <summary>Corner radius</summary>
+      <description>Radius of rounded screen corners in pixels (0 to disable)</description>
+      <range min="0" max="32"/>
+    </key>
+
+    <key name="enable-live-wallpaper" type="b">
+      <default>false</default>
+      <summary>Enable live wallpaper</summary>
+      <description>Automatically change wallpaper daily using Unsplash</description>
+    </key>
+
+    <key name="unsplash-api-key" type="s">
+      <default>''</default>
+      <summary>Unsplash API key</summary>
+      <description>Your Unsplash API access key</description>
+    </key>
+
+    <key name="wallpaper-keywords" type="s">
+      <default>''</default>
+      <summary>Wallpaper keywords</summary>
+      <description>Comma-separated keywords for wallpaper search</description>
+    </key>
+
+    <key name="last-wallpaper-change" type="s">
+      <default>''</default>
+      <summary>Last wallpaper change date</summary>
+      <description>Date of last wallpaper change (YYYY-MM-DD)</description>
+    </key>
+
+    <key name="enable-auto-theme" type="b">
+      <default>false</default>
+      <summary>Enable automatic theme switching</summary>
+      <description>Automatically switch between light and dark theme based on time</description>
+    </key>
+
+    <key name="sunrise-time" type="s">
+      <default>'06:00'</default>
+      <summary>Sunrise time</summary>
+      <description>Time to switch to light theme (HH:MM format)</description>
+    </key>
+
+    <key name="sunset-time" type="s">
+      <default>'18:00'</default>
+      <summary>Sunset time</summary>
+      <description>Time to switch to dark theme (HH:MM format)</description>
+    </key>
+
+  </schema>
+</schemalist>

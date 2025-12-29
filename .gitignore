@@ -1,0 +1,25 @@
+# Compiled schemas
+schemas/gschemas.compiled
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Distribution files
+*.zip
+*.tar.gz
