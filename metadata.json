@@ -1,7 +1,7 @@
 {
   "name": "Nowa Desktop",
   "description": "All-in-one desktop appearance: adaptive top bar, rounded corners, and more",
-  "uuid": "nowa-desktop@extensions.gnome.org",
+  "uuid": "nowa-desktop@nowaos",
   "shell-version": [
     "48"
   ],

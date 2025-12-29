@@ -2,7 +2,7 @@
 
 # Nowa Desktop - Uninstall script
 
-EXTENSION_UUID="nowa-desktop@extensions.gnome.org"
+EXTENSION_UUID="nowa-desktop@nowaos"
 EXTENSION_DIR="$HOME/.local/share/gnome-shell/extensions/$EXTENSION_UUID"
 
 echo "======================================"

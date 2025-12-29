@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Go to the project root (one level up from bin/)
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-EXTENSION_UUID="nowa-desktop@extensions.gnome.org"
+EXTENSION_UUID="nowa-desktop@nowaos"
 EXTENSION_DIR="$HOME/.local/share/gnome-shell/extensions/$EXTENSION_UUID"
 SCHEMA_DIR="$EXTENSION_DIR/schemas"
 
