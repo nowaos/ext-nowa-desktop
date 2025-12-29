@@ -8,12 +8,12 @@
 }
 
 /* State 1: Dark - Clean dark background with white icons/text */
-.dark {
+#panel.dark {
   background-color: transparent !important;
   color: white;
 }
 
-.dark .panel-button {
+#panel.dark .panel-button {
   color: white;
   font-weight: bold;
   text-shadow:
@@ -21,26 +21,26 @@
     0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.dark .panel-button StIcon,
-.dark .panel-button StLabel {
+#panel.dark .panel-button StIcon,
+#panel.dark .panel-button StLabel {
   color: white;
 }
 
-.dark .panel-button.clock-display .clock {
+#panel.dark .panel-button.clock-display .clock {
   color: white !important;
 }
 
-.dark .workspace-dot {
+#panel.dark .workspace-dot {
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* State 2: Light - Clean light background with black icons/text */
-.light {
+#panel.light {
   background-color: transparent !important;
   color: rgba(0, 0, 0, 0.65);
 }
 
-.light .panel-button {
+#panel.light .panel-button {
   color: rgba(0, 0, 0, 0.65);
   font-weight: bold;
   text-shadow:
@@ -48,27 +48,27 @@
     0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.light .panel-button StIcon,
-.light .panel-button StLabel {
+#panel.light .panel-button StIcon,
+#panel.light .panel-button StLabel {
   color: rgba(0, 0, 0, 0.65);
 }
 
-.light .panel-button.clock-display .clock {
+#panel.light .panel-button.clock-display .clock {
   color: rgba(0, 0, 0, 0.65) !important;
 }
 
-.light .workspace-dot {
+#panel.light .workspace-dot {
   background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 /* State 3: Translucent Dark - Busy dark background - 25% opacity */
-.translucent-dark {
+#panel.translucent-dark {
   background-color: rgba(0, 0, 0, 0.25) !important;
   backdrop-filter: blur(10px) !important;
   color: white;
 }
 
-.translucent-dark .panel-button {
+#panel.translucent-dark .panel-button {
   color: white;
   font-weight: bold;
   text-shadow:
@@ -76,65 +76,64 @@
     0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-.translucent-dark .panel-button StIcon,
-.translucent-dark .panel-button StLabel {
+#panel.translucent-dark .panel-button StIcon,
+#panel.translucent-dark .panel-button StLabel {
   color: white;
 }
 
-.translucent-dark .panel-button.clock-display .clock {
+#panel.translucent-dark .panel-button.clock-display .clock {
   color: white !important;
 }
 
-.translucent-dark .workspace-dot {
+#panel.translucent-dark .workspace-dot {
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* State 4: Translucent Light - Busy light background - 20% opacity */
-.translucent-light {
+#panel.translucent-light {
   background-color: rgba(255, 255, 255, 0.20) !important;
   backdrop-filter: blur(10px) !important;
   color: rgba(0, 0, 0, 0.65);
 }
 
-.translucent-light .panel-button {
+#panel.translucent-light .panel-button {
   color: rgba(0, 0, 0, 0.65);
   font-weight: bold;
   text-shadow: none;
 }
 
-.translucent-light .panel-button StIcon,
-.translucent-light .panel-button StLabel {
+#panel.translucent-light .panel-button StIcon,
+#panel.translucent-light .panel-button StLabel {
   color: rgba(0, 0, 0, 0.65);
 }
 
-.translucent-light .panel-button.clock-display .clock {
+#panel.translucent-light .panel-button.clock-display .clock {
   color: rgba(0, 0, 0, 0.65) !important;
 }
 
-.translucent-light .workspace-dot {
+#panel.translucent-light .workspace-dot {
   background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 /* Window Maximized State - Black opaque panel with white text */
-#panel:windowmax {
+#panel.maximized {
   background-color: rgba(0, 0, 0, 1.0) !important;
   color: white !important;
 }
 
-#panel:windowmax .panel-button {
+#panel.maximized .panel-button {
   color: white !important;
 }
 
-#panel:windowmax .panel-button StIcon,
-#panel:windowmax .panel-button StLabel {
+#panel.maximized .panel-button StIcon,
+#panel.maximized .panel-button StLabel {
   color: white !important;
 }
 
-#panel:windowmax .panel-button.clock-display .clock {
+#panel.maximized .panel-button.clock-display .clock {
   color: white !important;
 }
 
-#panel:windowmax .workspace-dot {
+#panel.maximized .workspace-dot {
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
-
