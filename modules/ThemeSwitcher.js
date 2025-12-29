@@ -115,7 +115,7 @@ export class ThemeSwitcher extends Module {
         const isDayTime = currentTimeInMinutes >= sunriseInMinutes && currentTimeInMinutes < sunsetInMinutes;
 
         const currentTheme = this.#interfaceSettings.get_string('color-scheme');
-        const targetTheme = isDayTime ? 'prefer-light' : 'prefer-dark';
+        const targetTheme = isDayTime ? 'default' : 'prefer-dark';
 
         // If manually set, only change if we crossed a transition time
         if (this.#manuallySetTheme) {
