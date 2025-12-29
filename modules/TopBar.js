@@ -183,10 +183,17 @@ export class TopBar extends Module {
                 const file = Gio.File.new_for_path(wallpaperPath);
                 this.#fileMonitor = file.monitor_file(Gio.FileMonitorFlags.NONE, null);
                 this.#fileMonitor.connect('changed', (monitor, file, otherFile, eventType) => {
-                    if (eventType === Gio.FileMonitorEvent.CHANGES_DONE_HINT || eventType === Gio.FileMonitorEvent.CREATED) {
-                        this.#onWallpaperChanged();
+                    if (eventType === Gio.FileMonitorEvent.CHANGED ||
+                        eventType === Gio.FileMonitorEvent.CREATED ||
+                        eventType === Gio.FileMonitorEvent.ATTRIBUTE_CHANGED) {
+                        Logger.debug(this.name, 'Wallpaper file changed');
+                        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
+                            this.#onWallpaperChanged();
+                            return GLib.SOURCE_REMOVE;
+                        });
                     }
                 });
+                Logger.debug(this.name, `File monitor setup for ${wallpaperPath}`);
             }
         } catch (e) {
             Logger.error(`Failed to setup file monitor: ${e.message}`);
@@ -336,10 +343,19 @@ export class TopBar extends Module {
 
     #getWallpaperPath() {
         try {
-            const uri = this.#backgroundSettings.get_string(BACKGROUND_KEY);
+            let uri = this.#backgroundSettings.get_string(BACKGROUND_KEY);
+
+            Logger.debug(this.name, `Raw URI: ${uri}`);
+
+            // Remove file:// prefix
             if (uri.startsWith('file://')) {
-                return uri.substring(7);
+                uri = uri.substring(7);
             }
+
+            // Decode URL
+            uri = decodeURIComponent(uri);
+
+            return uri;
         } catch (e) {
             Logger.error(`Failed to get wallpaper path: ${e.message}`);
         }
@@ -366,11 +382,19 @@ export class TopBar extends Module {
                 return GLib.SOURCE_REMOVE;
             }
 
-            // Use WallpaperAnalyzer service (SRP: Single Responsibility Principle)
-            const threshold = this.#settings.get_double('luminance-threshold');
-            const analysis = WallpaperAnalyzer.analyze(wallpaperPath, threshold);
+            // Update file monitor for new wallpaper
+            if (this.#fileMonitor) {
+                this.#fileMonitor.cancel();
+                this.#fileMonitor = null;
+            }
+            this.#setupFileMonitor();
 
-            this.#applyStyle(analysis.isDark ? 'light' : 'dark');
+            // Use WallpaperAnalyzer service with panel height
+            const threshold = this.#settings.get_double('luminance-threshold');
+            const panelHeight = this.#panel.get_height() || 32;
+            const result = WallpaperAnalyzer.analyze(wallpaperPath, threshold, panelHeight);
+
+            this.#applyStyle(result.style);
 
             return GLib.SOURCE_REMOVE;
         });

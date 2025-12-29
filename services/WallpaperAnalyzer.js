@@ -8,98 +8,208 @@ import { Logger } from '../utils/Logger.js';
 /**
  * WallpaperAnalyzer - Single Responsibility: Analyze wallpaper colors and luminance
  *
- * Responsibilities:
- * - Load wallpaper image
- * - Extract color information
- * - Calculate luminance
- * - Determine if background is dark or light
+ * Based on ElementaryOS WingPanel algorithm with enhanced analysis
  */
 export class WallpaperAnalyzer {
   /**
-   * Analyzes a wallpaper and determines if it's dark or light
+   * Analyzes a wallpaper and determines appropriate panel style
    * @param {string} wallpaperPath - Path to wallpaper file
    * @param {number} luminanceThreshold - Threshold for dark/light detection (0.0-1.0)
-   * @returns {object} Analysis result: { isDark: boolean, luminance: number }
+   * @param {number} panelHeight - Height of panel for crop (default 32)
+   * @returns {object} Analysis result with style recommendation
    */
-  static analyze(wallpaperPath, luminanceThreshold = 0.575) {
+  static analyze(wallpaperPath, luminanceThreshold = 0.575, panelHeight = 32) {
     try {
-      // Load wallpaper at reduced size for performance
-      const pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-        wallpaperPath,
-        100,
-        -1,
-        true
+      // Load FULL image (no scaling)
+      const fullPixbuf = GdkPixbuf.Pixbuf.new_from_file(wallpaperPath);
+      const fullWidth = fullPixbuf.get_width();
+      const fullHeight = fullPixbuf.get_height();
+
+      // CROP top slice (exact panel height at native resolution)
+      const bgSlice = fullPixbuf.new_subpixbuf(
+        0,           // x: start at left edge
+        0,           // y: start at top
+        fullWidth,   // width: full image width
+        Math.min(panelHeight, fullHeight)  // height: panel height
       );
 
-      const luminance = this.#calculateLuminance(pixbuf);
-      const isDark = luminance < luminanceThreshold;
-
-      Logger.debug('WallpaperAnalyzer', `Luminance: ${luminance.toFixed(3)}, Threshold: ${luminanceThreshold}, Dark: ${isDark}`);
+      const analysis = this.#analyzeTopRegion(bgSlice);
+      const style = this.#determineStyle(analysis, luminanceThreshold);
 
       return {
-        isDark,
-        luminance,
-        threshold: luminanceThreshold
+        style,
+        ...analysis
       };
 
     } catch (error) {
-      Logger.error(`WallpaperAnalyzer: Failed to analyze wallpaper - ${error.message}`);
-      // Default to light background on error
+      Logger.error(`WallpaperAnalyzer: Failed to analyze - ${error.message}`);
+      // Default to dark style on error
       return {
-        isDark: false,
-        luminance: 0.5,
-        threshold: luminanceThreshold,
+        style: 'dark',
+        meanLuminance: 0.5,
         error: error.message
       };
     }
   }
 
   /**
-   * Calculates average luminance of top portion of image
-   * @param {GdkPixbuf.Pixbuf} pixbuf - Image pixbuf
-   * @returns {number} Average luminance (0.0-1.0)
+   * Analyzes the top region of wallpaper
    * @private
    */
-  static #calculateLuminance(pixbuf) {
-    const pixels = pixbuf.get_pixels();
-    const rowstride = pixbuf.get_rowstride();
-    const height = pixbuf.get_height();
-    const width = pixbuf.get_width();
-    const nChannels = pixbuf.get_n_channels();
+  static #analyzeTopRegion(bgSlice) {
+    const width = bgSlice.get_width();
+    const height = bgSlice.get_height();
+    const rowstride = bgSlice.get_rowstride();
+    const pixels = bgSlice.get_pixels();
+    const hasAlpha = bgSlice.get_has_alpha();
+    const channels = hasAlpha ? 4 : 3;
 
-    let totalLuminance = 0;
+    return this.#analyzePixels(pixels, width, height, rowstride, channels);
+  }
+
+  /**
+   * Analyzes pixels using checkerboard sampling
+   * @private
+   */
+  static #analyzePixels(pixels, width, height, rowstride, channels) {
+    let totalLuminosity = 0;
+    let luminositySquaredSum = 0;
+    let minLuminosity = 1;
+    let maxLuminosity = 0;
     let sampleCount = 0;
 
-    // Sample top 30% of image (where panel will be)
-    const sampleHeight = Math.min(30, Math.floor(height * 0.3));
+    // Track RGB values for darkest and lightest pixels
+    let minRGB = { r: 255, g: 255, b: 255 };
+    let maxRGB = { r: 0, g: 0, b: 0 };
 
-    for (let y = 0; y < sampleHeight; y++) {
-      for (let x = 0; x < width; x++) {
-        const offset = y * rowstride + x * nChannels;
-        const r = pixels[offset];
-        const g = pixels[offset + 1];
-        const b = pixels[offset + 2];
+    // Checkerboard pattern sampling: 4px spacing
+    for (let y = 0; y < height; y++) {
+      const xOffset = (y % 2) * 2;  // 0 for even rows, 2 for odd rows
 
-        // Calculate relative luminance (ITU-R BT.709)
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        totalLuminance += luminance;
+      for (let x = xOffset; x < width; x += 4) {
+        const pixelIndex = y * rowstride + x * channels;
+
+        const r = pixels[pixelIndex] / 255;
+        const g = pixels[pixelIndex + 1] / 255;
+        const b = pixels[pixelIndex + 2] / 255;
+
+        // Calculate relative luminosity (ITU-R BT.709)
+        const luminosity = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        totalLuminosity += luminosity;
+        luminositySquaredSum += luminosity * luminosity;
+
+        // Track min/max and their RGB values
+        if (luminosity < minLuminosity) {
+          minLuminosity = luminosity;
+          minRGB = {
+            r: Math.round(r * 255),
+            g: Math.round(g * 255),
+            b: Math.round(b * 255)
+          };
+        }
+        if (luminosity > maxLuminosity) {
+          maxLuminosity = luminosity;
+          maxRGB = {
+            r: Math.round(r * 255),
+            g: Math.round(g * 255),
+            b: Math.round(b * 255)
+          };
+        }
+
         sampleCount++;
       }
     }
 
-    return totalLuminance / sampleCount;
+    // Calculate statistics
+    const meanLuminance = totalLuminosity / sampleCount;
+    const variance = (luminositySquaredSum / sampleCount) - (meanLuminance * meanLuminance);
+    const luminanceStd = Math.sqrt(Math.max(0, variance));
+
+    return {
+      meanLuminance,
+      luminanceStd,
+      minLuminosity,
+      maxLuminosity,
+      minRGB,
+      maxRGB,
+      sampleCount,
+      width,
+      height
+    };
   }
 
   /**
-   * Extracts dominant colors from wallpaper
-   * @param {string} wallpaperPath - Path to wallpaper file
-   * @param {number} numColors - Number of dominant colors to extract
-   * @returns {Array} Array of RGB color objects
+   * Determines panel style based on analysis
+   * @private
    */
-  static extractDominantColors(wallpaperPath, numColors = 5) {
-    // Future enhancement: K-means clustering for color extraction
-    // Currently not used but ready for future features
-    Logger.debug('WallpaperAnalyzer', 'Color extraction not yet implemented');
-    return [];
+  static #determineStyle(analysis, LUMINANCE_THRESHOLD) {
+    const STD_THRESHOLD = 45 / 255; // 0.176 (from ElementaryOS)
+
+    const meanLuminance = analysis.meanLuminance;
+    const luminanceStd = analysis.luminanceStd;
+    const minColor = analysis.minLuminosity;
+    const maxColor = analysis.maxLuminosity;
+    const minRGB = analysis.minRGB;
+    const maxRGB = analysis.maxRGB;
+
+    // Helper functions for logging
+    const toHex = (rgb) => {
+      const r = rgb.r.toString(16).padStart(2, '0');
+      const g = rgb.g.toString(16).padStart(2, '0');
+      const b = rgb.b.toString(16).padStart(2, '0');
+      return `#${r}${g}${b}`.toUpperCase();
+    };
+
+    const colorSquare = (rgb) => {
+      return `\x1b[48;2;${rgb.r};${rgb.g};${rgb.b}m  \x1b[0m`;
+    };
+
+    // Log analysis
+    Logger.log('=== WALLPAPER ANALYSIS ===');
+    Logger.log(`sample: ${analysis.width}x${analysis.height} (${analysis.sampleCount} pixels)`);
+    Logger.log(`mean_luminance: ${meanLuminance.toFixed(3)}`);
+    Logger.log(`std: ${luminanceStd.toFixed(3)}`);
+    Logger.log(`darkest_color: ${minColor.toFixed(3)} (${colorSquare(minRGB)} ${toHex(minRGB)})`);
+    Logger.log(`lightest_color: ${maxColor.toFixed(3)} (${colorSquare(maxRGB)} ${toHex(maxRGB)})`);
+
+    // STEP 1: Is background dark or light?
+    const isBgDark = meanLuminance < LUMINANCE_THRESHOLD;
+    Logger.log(`is_bg_dark: ${isBgDark} (threshold: ${LUMINANCE_THRESHOLD.toFixed(3)})`);
+
+    // STEP 2: Is background busy (has patterns/textures)?
+    const highVariance = luminanceStd > STD_THRESHOLD;
+    const nearBoundary = (meanLuminance < LUMINANCE_THRESHOLD &&
+                         meanLuminance + 1.645 * luminanceStd > LUMINANCE_THRESHOLD);
+    const isBusy = highVariance || nearBoundary;
+    Logger.log(`is_busy: ${isBusy} (high_variance: ${highVariance}, near_boundary: ${nearBoundary})`);
+
+    // STEP 3: Determine panel state
+    let state;
+    let description;
+
+    if (isBgDark) {
+      // Dark background -> white text
+      if (isBusy) {
+        state = 'translucent-dark';
+        description = 'dark panel + white text';
+      } else {
+        state = 'dark';
+        description = 'transparent + white text';
+      }
+    } else {
+      // Light background -> black text
+      if (isBusy) {
+        state = 'translucent-light';
+        description = 'light panel + black text';
+      } else {
+        state = 'light';
+        description = 'transparent + black text';
+      }
+    }
+
+    Logger.log(`=== RESULT: ${state} (${description}) ===`);
+
+    return state;
   }
 }
