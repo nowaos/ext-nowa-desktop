@@ -68,7 +68,8 @@ If you enjoy this extension, consider supporting the development:
 
 ## Bug Reports & Feature Requests
 
-Please use the [issue tracker](https://github.com/yourusername/nowa-desktop/issues) to report any bugs or file feature requests.
+Please use the [issue tracker](https://github.com/nowaos/ext-nowa-desktop/issues) to report any
+bugs or file feature requests.
 
 ## Contributing
 

@@ -6,6 +6,6 @@
     "48"
   ],
   "version": 2,
-  "url": "https://github.com/yourusername/nowa-desktop",
+  "url": "https://github.com/nowaos/ext-nowa-desktop",
   "settings-schema": "org.gnome.shell.extensions.nowa-desktop"
 }
