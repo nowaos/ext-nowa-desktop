@@ -8,7 +8,7 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-import { Module } from './Module.js';
+import { _BaseModule } from './_BaseModule.js';
 import { Logger } from '../utils/Logger.js';
 import { WallpaperAnalyzer } from '../services/WallpaperAnalyzer.js';
 
@@ -17,9 +17,9 @@ const BACKGROUND_KEY = 'picture-uri';
 const BACKGROUND_KEY_DARK = 'picture-uri-dark';
 
 /**
- * TopBar module - adaptive panel based on wallpaper analysis and window state
+ * Adaptive Panel - adaptive panel based on wallpaper analysis and window state
  */
-export class TopBar extends Module {
+export class AdaptivePanel extends _BaseModule {
     #settings;
     #backgroundSettings;
     #panel;
@@ -35,7 +35,7 @@ export class TopBar extends Module {
     #settingsConnections = [];
 
     constructor(settings) {
-        super('TopBar');
+        super('Adaptive Panel');
         this.#settings = settings;
         this.#backgroundSettings = new Gio.Settings({ schema: BACKGROUND_SCHEMA });
         this.#panel = Main.panel;
@@ -84,9 +84,11 @@ export class TopBar extends Module {
         // Monitor Overview to hide/show panel with animations
         this.#overviewShowingConnection = Main.overview.connect('showing', () => {
             this.#panel.opacity = 0;
+            this.#panel.reactive = false; // Disable interaction when hidden
         });
 
         this.#overviewHidingConnection = Main.overview.connect('hiding', () => {
+            this.#panel.reactive = true; // Re-enable interaction before animation
             this.#panel.translation_y = -6;
             this.#panel.opacity = 0;
 
@@ -256,13 +258,13 @@ export class TopBar extends Module {
         }
 
         const metaWindow = metaWindowActor.get_meta_window();
-        
+
         if (this.#windowSignalIds.has(metaWindow)) {
             return;
         }
 
         const signalIds = [];
-        
+
         signalIds.push(metaWindow.connect('size-changed', () => {
             this.#updateMaximizedState();
         }));

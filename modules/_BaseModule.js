@@ -6,7 +6,7 @@ import { Logger } from '../utils/Logger.js';
 /**
  * Base class for all Nowa Desktop modules
  */
-export class Module {
+export class _BaseModule {
     #name;
 
     constructor(name) {

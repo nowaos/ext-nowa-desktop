@@ -2,9 +2,9 @@
 
 # Nowa Desktop - Debug script
 
-EXTENSION_UUID="nowa-desktop@extensions.gnome.org"
+EXTENSION_UUID="nowa-desktop@nowaos"
 EXTENSION_DIR="$HOME/.local/share/gnome-shell/extensions/$EXTENSION_UUID"
-SCHEMA="org.gnome.shell.extensions.nowa-topbar"
+SCHEMA="org.gnome.shell.extensions.nowa-desktop"
 
 # Color codes
 GREEN='\033[0;32m'

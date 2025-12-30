@@ -4,13 +4,13 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { Module } from './Module.js';
+import { _BaseModule } from './_BaseModule.js';
 import { Logger } from '../utils/Logger.js';
 
 /**
  * ThemeSwitcher module - automatically switches between light/dark theme based on time
  */
-export class ThemeSwitcher extends Module {
+export class ThemeSwitcher extends _BaseModule {
     #settings;
     #interfaceSettings;
     #interfaceSettingsConnection = null;
@@ -115,6 +115,8 @@ export class ThemeSwitcher extends Module {
         const isDayTime = currentTimeInMinutes >= sunriseInMinutes && currentTimeInMinutes < sunsetInMinutes;
 
         const currentTheme = this.#interfaceSettings.get_string('color-scheme');
+        // IMPORTANT: Use 'default' for light theme, not 'prefer-light'
+        // 'prefer-light' forces light theme on Shell (Calendar/QS), 'default' doesn't
         const targetTheme = isDayTime ? 'default' : 'prefer-dark';
 
         // If manually set, only change if we crossed a transition time
@@ -150,7 +152,7 @@ export class ThemeSwitcher extends Module {
                 });
             }
 
-            Logger.log(`Theme switched to ${targetTheme === 'prefer-dark' ? 'Dark' : 'Light'} (${currentHour}:${currentMinute.toString().padStart(2, '0')})`);
+            Logger.log(`Theme switched to ${targetTheme === 'prefer-dark' ? 'Dark' : 'Light (default)'} (${currentHour}:${currentMinute.toString().padStart(2, '0')})`);
         }
     }
 }

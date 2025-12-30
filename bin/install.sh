@@ -40,6 +40,7 @@ cp "$PROJECT_ROOT/prefs.js" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/modules" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/services" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/utils" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/prefs" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/assets" "$EXTENSION_DIR/"
 
 # Step 4: Copy and compile schema
@@ -79,12 +80,12 @@ else
   echo ""
   echo "Restart GNOME Shell (Alt+F2, type 'r', press Enter)"
   read -p "Press Enter to continue..."
-  
+
   busctl --user call org.gnome.Shell /org/gnome/Shell org.gnome.Shell Eval s 'Meta.restart("Restarting...")' &>/dev/null || {
     echo "Manual restart required (Alt+F2, type 'r', Enter)"
     read -p "Press Enter after restarting..."
   }
-  
+
   gnome-extensions enable "$EXTENSION_UUID"
   echo -e "${GREEN}✓${NC} Extension enabled"
 fi

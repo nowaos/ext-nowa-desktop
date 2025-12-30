@@ -39,7 +39,7 @@ chmod +x bin/install.sh
 
 Run preferences:
 ```bash
-gnome-extensions prefs nowa-desktop@extensions.gnome.org
+gnome-extensions prefs nowa-desktop@nowaos
 ```
 
 ## Development

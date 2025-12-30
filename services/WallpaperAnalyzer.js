@@ -181,8 +181,15 @@ export class WallpaperAnalyzer {
     const highVariance = luminanceStd > STD_THRESHOLD;
     const nearBoundary = (meanLuminance < LUMINANCE_THRESHOLD &&
                          meanLuminance + 1.645 * luminanceStd > LUMINANCE_THRESHOLD);
-    const isBusy = highVariance || nearBoundary;
-    Logger.log(`is_busy: ${isBusy} (high_variance: ${highVariance}, near_boundary: ${nearBoundary})`);
+
+    // High contrast range indicates areas with very different luminance
+    // (e.g., bright sky with dark tree in corner where icons are)
+    const range = maxColor - minColor;
+    const highContrast = range > 0.5;
+
+    const isBusy = highVariance || nearBoundary || highContrast;
+
+    Logger.log(`is_busy: ${isBusy} (high_variance: ${highVariance}, near_boundary: ${nearBoundary}, high_contrast: ${highContrast}, range: ${range.toFixed(3)})`);
 
     // STEP 3: Determine panel state
     let state;

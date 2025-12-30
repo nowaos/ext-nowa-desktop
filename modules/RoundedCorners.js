@@ -6,13 +6,13 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-import { Module } from './Module.js';
+import { _BaseModule } from './_BaseModule.js';
 import { Logger } from '../utils/Logger.js';
 
 /**
  * RoundedCorners module - adds rounded corners to screen edges
  */
-export class RoundedCorners extends Module {
+export class RoundedCorners extends _BaseModule {
     #settings;
     #corners = {};
     #monitorListener = null;
