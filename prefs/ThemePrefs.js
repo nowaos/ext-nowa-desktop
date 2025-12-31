@@ -39,13 +39,13 @@ export class ThemePrefs {
         sunriseRow.set_text(settings.get_string('sunrise-time'));
         sunriseRow.connect('changed', (widget) => {
             let text = widget.get_text().trim();
-            
+
             // Accept HHMM format and convert to HH:MM
             if (/^[0-2][0-9][0-5][0-9]$/.test(text)) {
                 text = text.substring(0, 2) + ':' + text.substring(2);
                 widget.set_text(text);
             }
-            
+
             // Validate HH:MM format
             if (/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(text)) {
                 settings.set_string('sunrise-time', text);
@@ -62,13 +62,13 @@ export class ThemePrefs {
         sunsetRow.set_text(settings.get_string('sunset-time'));
         sunsetRow.connect('changed', (widget) => {
             let text = widget.get_text().trim();
-            
+
             // Accept HHMM format and convert to HH:MM
             if (/^[0-2][0-9][0-5][0-9]$/.test(text)) {
                 text = text.substring(0, 2) + ':' + text.substring(2);
                 widget.set_text(text);
             }
-            
+
             // Validate HH:MM format
             if (/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(text)) {
                 settings.set_string('sunset-time', text);
