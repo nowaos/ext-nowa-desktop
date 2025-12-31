@@ -9,6 +9,8 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { _BaseModule } from './_BaseModule.js';
 import { Logger } from '../utils/Logger.js';
 
+const CORNER_RADIUS = 6;
+
 /**
  * RoundedCorners module - adds rounded corners to screen edges
  */
@@ -26,9 +28,6 @@ export class RoundedCorners extends _BaseModule {
 
     enable() {
         super.enable();
-
-        // Listen for corner radius changes
-        this.#settings.connect('changed::corner-radius', () => this.#draw());
 
         // Monitor changes to redraw corners
         this.#monitorListener = Gio.DBus.session.signal_subscribe(
@@ -62,7 +61,7 @@ export class RoundedCorners extends _BaseModule {
         // Destroy existing corners first
         this.#destroy();
 
-        const radius = this.#settings.get_int('corner-radius');
+        const radius = CORNER_RADIUS;
         const cornerDir = this.#extensionDir.get_child('assets').get_child('corners').get_path();
 
         Logger.debug(this.name, `Drawing corners with radius ${radius}px`);

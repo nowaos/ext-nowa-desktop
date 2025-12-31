@@ -74,33 +74,6 @@ export class DesktopPrefs {
 
         page.add(panelGroup);
 
-        // === ROUNDED CORNERS GROUP ===
-        const cornersGroup = new Adw.PreferencesGroup({
-            title: 'Rounded Corners',
-            description: 'Screen corner radius',
-        });
-
-        const radiusRow = new Adw.SpinRow({
-            title: 'Corner Radius',
-            subtitle: 'Radius in pixels (0 to disable)',
-            adjustment: new Gtk.Adjustment({
-                lower: 0,
-                upper: 32,
-                step_increment: 1,
-                page_increment: 4,
-            }),
-            digits: 0,
-        });
-
-        radiusRow.set_value(settings.get_int('corner-radius'));
-        radiusRow.connect('notify::value', (widget) => {
-            settings.set_int('corner-radius', widget.value);
-        });
-
-        cornersGroup.add(radiusRow);
-
-        page.add(cornersGroup);
-
         return page;
     }
 }
