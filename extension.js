@@ -7,6 +7,7 @@ import { AdaptivePanel } from './modules/AdaptivePanel.js';
 import { RoundedCorners } from './modules/RoundedCorners.js';
 import { ThemeSwitcher } from './modules/ThemeSwitcher.js';
 import { LiveWallpaper } from './modules/LiveWallpaper.js';
+import { ShellTweaks } from './modules/ShellTweaks.js';
 import { Logger } from './utils/Logger.js';
 
 /**
@@ -32,6 +33,7 @@ export default class NowaDesktopExtension extends Extension {
             new RoundedCorners(settings, this.dir),
             new ThemeSwitcher(settings),
             new LiveWallpaper(settings),
+            new ShellTweaks(settings),
         ];
 
         // Enable all modules

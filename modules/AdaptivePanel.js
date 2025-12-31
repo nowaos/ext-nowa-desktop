@@ -83,12 +83,13 @@ export class AdaptivePanel extends _BaseModule {
 
         // Monitor Overview to hide/show panel with animations
         this.#overviewShowingConnection = Main.overview.connect('showing', () => {
+            // Move panel off-screen (above viewport)
+            const panelHeight = this.#panel.height;
+            this.#panel.translation_y = -panelHeight;
             this.#panel.opacity = 0;
-            this.#panel.reactive = false; // Disable interaction when hidden
         });
 
         this.#overviewHidingConnection = Main.overview.connect('hiding', () => {
-            this.#panel.reactive = true; // Re-enable interaction before animation
             this.#panel.translation_y = -6;
             this.#panel.opacity = 0;
 
