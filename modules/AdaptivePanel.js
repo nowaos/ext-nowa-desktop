@@ -15,6 +15,7 @@ import { WallpaperAnalyzer } from '../services/WallpaperAnalyzer.js';
 const BACKGROUND_SCHEMA = 'org.gnome.desktop.background';
 const BACKGROUND_KEY = 'picture-uri';
 const BACKGROUND_KEY_DARK = 'picture-uri-dark';
+const INTERFACE_SCHEMA = 'org.gnome.desktop.interface';
 
 /**
  * Adaptive Panel - adaptive panel based on wallpaper analysis and window state
@@ -22,6 +23,7 @@ const BACKGROUND_KEY_DARK = 'picture-uri-dark';
 export class AdaptivePanel extends _BaseModule {
     #settings;
     #backgroundSettings;
+    #interfaceSettings;
     #panel;
     #currentStyle = null;
     #fileMonitor = null;
@@ -38,6 +40,7 @@ export class AdaptivePanel extends _BaseModule {
         super('Adaptive Panel');
         this.#settings = settings;
         this.#backgroundSettings = new Gio.Settings({ schema: BACKGROUND_SCHEMA });
+        this.#interfaceSettings = new Gio.Settings({ schema: INTERFACE_SCHEMA });
         this.#panel = Main.panel;
     }
 
@@ -55,6 +58,14 @@ export class AdaptivePanel extends _BaseModule {
         this.#backgroundSignals.push(
             this.#backgroundSettings.connect(`changed::${BACKGROUND_KEY_DARK}`, () => {
                 Logger.debug(this.name, 'Dark background changed');
+                this.#onWallpaperChanged();
+            })
+        );
+
+        // Monitor color scheme changes (light/dark mode)
+        this.#backgroundSignals.push(
+            this.#interfaceSettings.connect('changed::color-scheme', () => {
+                Logger.debug(this.name, 'Color scheme changed');
                 this.#onWallpaperChanged();
             })
         );
@@ -346,8 +357,15 @@ export class AdaptivePanel extends _BaseModule {
 
     #getWallpaperPath() {
         try {
-            let uri = this.#backgroundSettings.get_string(BACKGROUND_KEY);
+            // Detect current color scheme
+            const colorScheme = this.#interfaceSettings.get_string('color-scheme');
+            const isDarkMode = colorScheme === 'prefer-dark';
 
+            // Use appropriate wallpaper (dark or light)
+            const wallpaperKey = isDarkMode ? BACKGROUND_KEY_DARK : BACKGROUND_KEY;
+            let uri = this.#backgroundSettings.get_string(wallpaperKey);
+
+            Logger.debug(this.name, `Color scheme: ${colorScheme}, using ${wallpaperKey}`);
             Logger.debug(this.name, `Raw URI: ${uri}`);
 
             // Remove file:// prefix
