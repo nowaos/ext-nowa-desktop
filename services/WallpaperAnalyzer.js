@@ -32,7 +32,7 @@ export class WallpaperAnalyzer {
         PADDING,
         PADDING,
         Math.max(0, fullWidth - (PADDING * 2)),
-        Math.max(0, panelHeight - PADDING, fullHeight - PADDING)
+        Math.max(0, Math.min(panelHeight, fullHeight) - PADDING)
       )
 
       const analysis = this.#analyzeTopRegion(bgSlice)
@@ -84,9 +84,9 @@ export class WallpaperAnalyzer {
     let minRGB = { r: 255, g: 255, b: 255 }
     let maxRGB = { r: 0, g: 0, b: 0 }
 
-    // Checkerboard pattern sampling: 4px spacing
-    for (let y = 0; y < height; y++) {
-      const xOffset = (y % 2) * 2  // 0 for even rows, 2 for odd rows
+    // Checkerboard pattern sampling: skip every other line, 4px spacing
+    for (let y = 0; y < height; y += 2) {
+      const xOffset = (y % 4 === 0) ? 0 : 2  // Alternates: line 0,4,8... → offset 0; line 2,6,10... → offset 2
 
       for (let x = xOffset; x < width; x += 4) {
         const pixelIndex = y * rowstride + x * channels
