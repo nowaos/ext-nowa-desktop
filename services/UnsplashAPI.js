@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Nowa Desktop Contributors
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import GLib from 'gi://GLib';
+import GLib from 'gi://GLib'
 
-import { Logger } from '../utils/Logger.js';
+import { Logger } from '../utils/Logger.js'
 
 /**
  * UnsplashAPI - Single Responsibility: Communicate with Unsplash API
@@ -18,14 +18,14 @@ import { Logger } from '../utils/Logger.js';
  * Dependency Inversion: Other services depend on this abstraction
  */
 export class UnsplashAPI {
-  #apiKey;
-  #baseUrl = 'https://api.unsplash.com';
+  #apiKey
+  #baseUrl = 'https://api.unsplash.com'
 
   /**
    * @param {string} apiKey - Unsplash API access key
    */
-  constructor(apiKey) {
-    this.#apiKey = apiKey;
+  constructor (apiKey) {
+    this.#apiKey = apiKey
   }
 
   /**
@@ -35,23 +35,23 @@ export class UnsplashAPI {
    * @param {string} options.query - Search keywords (comma-separated)
    * @returns {Promise<object>} Photo metadata
    */
-  async getRandomPhoto(options = {}) {
+  async getRandomPhoto (options = {}) {
     const {
       orientation = 'landscape',
       query = ''
-    } = options;
+    } = options
 
-    let url = `${this.#baseUrl}/photos/random?orientation=${orientation}`;
+    let url = `${this.#baseUrl}/photos/random?orientation=${orientation}`
 
     if (query) {
-      const keywords = query.split(',').map(k => k.trim()).filter(k => k).join(',');
-      url += `&query=${encodeURIComponent(keywords)}`;
+      const keywords = query.split(',').map(k => k.trim()).filter(k => k).join(',')
+      url += `&query=${encodeURIComponent(keywords)}`
     }
 
-    Logger.debug('UnsplashAPI', `Fetching random photo (keywords: ${query || 'none'})`);
+    Logger.debug('UnsplashAPI', `Fetching random photo (keywords: ${query || 'none'})`)
 
     try {
-      const response = await this.#makeRequest(url);
+      const response = await this.#makeRequest(url)
 
       return {
         id: response.id,
@@ -63,11 +63,11 @@ export class UnsplashAPI {
           name: response.user?.name,
           username: response.user?.username
         }
-      };
+      }
 
     } catch (error) {
-      Logger.error(`UnsplashAPI: Failed to fetch photo - ${error.message}`);
-      throw error;
+      Logger.error(`UnsplashAPI: Failed to fetch photo - ${error.message}`)
+      throw error
     }
   }
 
@@ -78,16 +78,16 @@ export class UnsplashAPI {
    * @param {number} quality - JPEG quality (1-100)
    * @returns {Promise<Uint8Array>} Image bytes
    */
-  async downloadImage(url, width = 3840, quality = 85) {
+  async downloadImage (url, width = 3840, quality = 85) {
     // Optimize URL with width and quality parameters
-    const optimizedUrl = `${url}&w=${width}&q=${quality}`;
+    const optimizedUrl = `${url}&w=${width}&q=${quality}`
 
-    Logger.debug('UnsplashAPI', `Downloading image (${width}px, q${quality})`);
+    Logger.debug('UnsplashAPI', `Downloading image (${width}px, q${quality})`)
 
     try {
-      const Soup = imports.gi.Soup;
-      const session = new Soup.Session();
-      const message = Soup.Message.new('GET', optimizedUrl);
+      const Soup = imports.gi.Soup
+      const session = new Soup.Session()
+      const message = Soup.Message.new('GET', optimizedUrl)
 
       const bytes = await new Promise((resolve, reject) => {
         session.send_and_read_async(
@@ -96,24 +96,24 @@ export class UnsplashAPI {
           null,
           (sess, result) => {
             try {
-              const b = sess.send_and_read_finish(result);
-              resolve(b);
+              const b = sess.send_and_read_finish(result)
+              resolve(b)
             } catch (e) {
-              reject(e);
+              reject(e)
             }
           }
-        );
-      });
+        )
+      })
 
       if (message.status_code !== 200) {
-        throw new Error(`HTTP ${message.status_code}`);
+        throw new Error(`HTTP ${message.status_code}`)
       }
 
-      return bytes.get_data();
+      return bytes.get_data()
 
     } catch (error) {
-      Logger.error(`UnsplashAPI: Failed to download image - ${error.message}`);
-      throw error;
+      Logger.error(`UnsplashAPI: Failed to download image - ${error.message}`)
+      throw error
     }
   }
 
@@ -123,13 +123,13 @@ export class UnsplashAPI {
    * @returns {Promise<object>} Parsed JSON response
    * @private
    */
-  async #makeRequest(url) {
-    const Soup = imports.gi.Soup;
-    const session = new Soup.Session();
-    const message = Soup.Message.new('GET', url);
+  async #makeRequest (url) {
+    const Soup = imports.gi.Soup
+    const session = new Soup.Session()
+    const message = Soup.Message.new('GET', url)
 
     // Add authentication header
-    message.request_headers.append('Authorization', `Client-ID ${this.#apiKey}`);
+    message.request_headers.append('Authorization', `Client-ID ${this.#apiKey}`)
 
     const bytes = await new Promise((resolve, reject) => {
       session.send_and_read_async(
@@ -138,28 +138,28 @@ export class UnsplashAPI {
         null,
         (sess, result) => {
           try {
-            const b = sess.send_and_read_finish(result);
-            resolve(b);
+            const b = sess.send_and_read_finish(result)
+            resolve(b)
           } catch (e) {
-            reject(e);
+            reject(e)
           }
         }
-      );
-    });
+      )
+    })
 
     if (message.status_code !== 200) {
-      throw new Error(`HTTP ${message.status_code}`);
+      throw new Error(`HTTP ${message.status_code}`)
     }
 
-    const decoder = new TextDecoder('utf-8');
-    return JSON.parse(decoder.decode(bytes));
+    const decoder = new TextDecoder('utf-8')
+    return JSON.parse(decoder.decode(bytes))
   }
 
   /**
    * Validates if API key is set
    * @returns {boolean}
    */
-  isConfigured() {
-    return this.#apiKey && this.#apiKey !== '';
+  isConfigured () {
+    return this.#apiKey && this.#apiKey !== ''
   }
 }
