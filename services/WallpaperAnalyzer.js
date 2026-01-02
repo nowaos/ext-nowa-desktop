@@ -31,7 +31,7 @@ export class WallpaperAnalyzer {
       const bgSlice = fullPixbuf.new_subpixbuf(
         PADDING,
         PADDING,
-        Math.max(0, fullWidth - (PADDING * 2)),
+        Math.max(1, fullWidth - (PADDING * 2)),
         Math.max(0, Math.min(panelHeight, fullHeight) - PADDING)
       )
 
@@ -164,7 +164,7 @@ export class WallpaperAnalyzer {
     }
 
     const colorSquare = (rgb) => {
-      return `\x1b[482${rgb.r}${rgb.g}${rgb.b}m  \x1b[0m`
+      return `\x1b[48;2;${rgb.r};${rgb.g};${rgb.b}m  \x1b[0m`
     }
 
     // Log analysis
