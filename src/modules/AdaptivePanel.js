@@ -9,7 +9,7 @@ import Meta from 'gi://Meta'
 import * as Main from 'resource:///org/gnome/shell/ui/main.js'
 
 import { _BaseModule } from './_BaseModule.js'
-import { Logger } from '../utils/Logger.js'
+import { Logger } from '../services/Logger.js'
 import { WallpaperAnalyzer } from '../services/WallpaperAnalyzer.js'
 
 const BACKGROUND_SCHEMA = 'org.gnome.desktop.background'

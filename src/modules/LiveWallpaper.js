@@ -5,7 +5,7 @@ import Gio from 'gi://Gio'
 import GLib from 'gi://GLib'
 
 import { _BaseModule } from './_BaseModule.js'
-import { Logger } from '../utils/Logger.js'
+import { Logger } from '../services/Logger.js'
 import { UnsplashAPI } from '../services/UnsplashAPI.js'
 
 const BACKGROUND_KEY = 'picture-uri'

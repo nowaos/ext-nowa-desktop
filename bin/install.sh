@@ -37,12 +37,8 @@ cp "$PROJECT_ROOT/extension.js" "$EXTENSION_DIR/"
 cp "$PROJECT_ROOT/metadata.json" "$EXTENSION_DIR/"
 cp "$PROJECT_ROOT/stylesheet.css" "$EXTENSION_DIR/"
 cp "$PROJECT_ROOT/prefs.js" "$EXTENSION_DIR/"
-cp -r "$PROJECT_ROOT/modules" "$EXTENSION_DIR/"
-cp -r "$PROJECT_ROOT/services" "$EXTENSION_DIR/"
-cp -r "$PROJECT_ROOT/utils" "$EXTENSION_DIR/"
-cp -r "$PROJECT_ROOT/prefs" "$EXTENSION_DIR/"
-cp -r "$PROJECT_ROOT/interfaces" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/assets" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/src" "$EXTENSION_DIR/"
 
 # Step 4: Copy and compile schema
 cp "$PROJECT_ROOT/schemas/org.gnome.shell.extensions.nowa-desktop.gschema.xml" "$SCHEMA_DIR/"

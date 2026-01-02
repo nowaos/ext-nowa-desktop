@@ -3,7 +3,7 @@
 
 import GLib from 'gi://GLib'
 
-import { Logger } from '../utils/Logger.js'
+import { Logger } from './Logger.js'
 
 /**
  * UnsplashAPI - Single Responsibility: Communicate with Unsplash API

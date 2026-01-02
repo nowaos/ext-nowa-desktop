@@ -3,7 +3,7 @@
 
 import GdkPixbuf from 'gi://GdkPixbuf'
 
-import { Logger } from '../utils/Logger.js'
+import { Logger } from './Logger.js'
 
 /**
 * WallpaperAnalyzer - Single Responsibility: Analyze wallpaper colors and luminance

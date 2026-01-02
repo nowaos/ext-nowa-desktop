@@ -5,7 +5,7 @@ import Gio from 'gi://Gio'
 import GLib from 'gi://GLib'
 
 import { _BaseModule } from './_BaseModule.js'
-import { Logger } from '../utils/Logger.js'
+import { Logger } from '../services/Logger.js'
 
 /**
 * ThemeSwitcher module - automatically switches between light/dark theme based on time

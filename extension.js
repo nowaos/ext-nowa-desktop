@@ -3,12 +3,12 @@
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js'
 
-import { AdaptivePanel } from './modules/AdaptivePanel.js'
-import { RoundedCorners } from './modules/RoundedCorners.js'
-import { ThemeSwitcher } from './modules/ThemeSwitcher.js'
-import { LiveWallpaper } from './modules/LiveWallpaper.js'
-import { ShellTweaks } from './modules/ShellTweaks.js'
-import { Logger } from './utils/Logger.js'
+import { AdaptivePanel } from './src/modules/AdaptivePanel.js'
+import { RoundedCorners } from './src/modules/RoundedCorners.js'
+import { ThemeSwitcher } from './src/modules/ThemeSwitcher.js'
+import { LiveWallpaper } from './src/modules/LiveWallpaper.js'
+import { ShellTweaks } from './src/modules/ShellTweaks.js'
+import { Logger } from './src/services/Logger.js'
 
 /**
 * Nowa Desktop - A complete desktop enhancement extension

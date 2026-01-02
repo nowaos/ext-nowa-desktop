@@ -3,9 +3,9 @@
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import { DesktopPrefs } from './prefs/DesktopPrefs.js';
-import { ThemePrefs } from './prefs/ThemePrefs.js';
-import { WallpaperPrefs } from './prefs/WallpaperPrefs.js';
+import { DesktopPrefs } from './src/prefs/DesktopPrefs.js';
+import { ThemePrefs } from './src/prefs/ThemePrefs.js';
+import { WallpaperPrefs } from './src/prefs/WallpaperPrefs.js';
 
 export default class NowaDesktopPreferences extends ExtensionPreferences {
   fillPreferencesWindow(window) {

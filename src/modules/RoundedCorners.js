@@ -7,7 +7,7 @@ import St from 'gi://St'
 import * as Main from 'resource:///org/gnome/shell/ui/main.js'
 
 import { _BaseModule } from './_BaseModule.js'
-import { Logger } from '../utils/Logger.js'
+import { Logger } from '../services/Logger.js'
 
 const CORNER_RADIUS = 6
 
