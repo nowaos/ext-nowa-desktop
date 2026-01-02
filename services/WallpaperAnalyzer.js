@@ -20,17 +20,19 @@ export class WallpaperAnalyzer {
    */
   static analyze(wallpaperPath, luminanceThreshold = 0.575, panelHeight = 32) {
     try {
+      // Tolerance zone: ignore 4px from each edge
+      const PADDING = 4;
+
       // Load FULL image (no scaling)
       const fullPixbuf = GdkPixbuf.Pixbuf.new_from_file(wallpaperPath);
       const fullWidth = fullPixbuf.get_width();
       const fullHeight = fullPixbuf.get_height();
 
-      // CROP top slice (exact panel height at native resolution)
       const bgSlice = fullPixbuf.new_subpixbuf(
-        0,           // x: start at left edge
-        0,           // y: start at top
-        fullWidth,   // width: full image width
-        Math.min(panelHeight, fullHeight)  // height: panel height
+        PADDING,
+        PADDING,
+        Math.max(0, fullWidth - (PADDING * 2)),
+        Math.max(0, panelHeight - PADDING, fullHeight - PADDING)
       );
 
       const analysis = this.#analyzeTopRegion(bgSlice);
