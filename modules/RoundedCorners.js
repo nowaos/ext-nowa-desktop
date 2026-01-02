@@ -75,7 +75,7 @@ export class RoundedCorners extends _BaseModule {
         let y = monitor.y + ((corner[0] == 't') ? 0 : monitor.height - geometryScale * radius)
 
         let cornerDecoration = this.#corners[`${monitor.index}-${corner}`] = new St.Bin({
-          style_class: `corner-decoration corner-{${corner}}`,
+          style_class: `corner-decoration corner-${corner}`,
           reactive: false,
           x, y,
           width: geometryScale * radius,
@@ -83,9 +83,9 @@ export class RoundedCorners extends _BaseModule {
           can_focus: false,
           track_hover: false,
           style: `
-                        background-image: url("${cornerDir}/corner-${corner}.svg")
-                        background-size: contain
-                    `
+            background-image: url("${cornerDir}/corner-${corner}.svg");
+            background-size: contain;
+          `
         })
 
         Main.uiGroup.add_child(cornerDecoration)

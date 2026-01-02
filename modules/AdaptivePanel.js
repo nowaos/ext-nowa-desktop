@@ -193,258 +193,256 @@ export class AdaptivePanel extends _BaseModule {
         const file = Gio.File.new_for_path(wallpaperPath)
         this.#fileMonitor = file.monitor_file(Gio.FileMonitorFlags.NONE, null)
         this.#fileMonitor.connect('changed', (monitor, file, otherFile, eventType) => {
-          if (eventType === Gio.FileMonitorEvent.CHANGED ||
+          if (
+            eventType === Gio.FileMonitorEvent.CHANGED ||
             eventType === Gio.FileMonitorEvent.CREATED ||
-            eventType === Gio.FileMonitorEvent.ATTRIBUTE_CHANGED) {
-              Logger.debug(this.name, 'Wallpaper file changed')
-              GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
-                this.#onWallpaperChanged()
-                return GLib.SOURCE_REMOVE
-              })
-            }
-          })
-          Logger.debug(this.name, `File monitor setup for ${wallpaperPath}`)
-        }
-      } catch (e) {
-        Logger.error(`Failed to setup file monitor: ${e.message}`)
+            eventType === Gio.FileMonitorEvent.ATTRIBUTE_CHANGED
+          ) {
+            Logger.debug(this.name, 'Wallpaper file changed')
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
+              this.#onWallpaperChanged()
+              return GLib.SOURCE_REMOVE
+            })
+          }
+        })
+        Logger.debug(this.name, `File monitor setup for ${wallpaperPath}`)
       }
+    } catch (e) {
+      Logger.error(`Failed to setup file monitor: ${e.message}`)
     }
+  }
 
-    #setupWindowTracking () {
-      this.#windowSignalIds = new Map()
-      this.#actorSignalIds = new Map()
+  #setupWindowTracking () {
+    this.#windowSignalIds = new Map()
+    this.#actorSignalIds = new Map()
 
-      const tracker = global.display.get_workspace_manager().get_active_workspace()
-      const windows = tracker.list_windows()
+    const tracker = global.display.get_workspace_manager().get_active_workspace()
+    const windows = tracker.list_windows()
 
-      windows.forEach(metaWindow => {
-        const metaWindowActor = metaWindow.get_compositor_private()
-        if (metaWindowActor) {
-          this.#onWindowActorAdded(metaWindowActor.get_parent(), metaWindowActor)
-        }
-      })
-
-      const windowManager = global.window_manager
-      global.display.connect('window-created', (display, metaWindow) => {
-        const metaWindowActor = metaWindow.get_compositor_private()
-        if (metaWindowActor) {
-          this.#onWindowActorAdded(metaWindowActor.get_parent(), metaWindowActor)
-        }
-      })
-    }
-
-    #cleanupWindowTracking () {
-      if (this.#windowSignalIds) {
-        for (let [metaWindow, signalIds] of this.#windowSignalIds.entries()) {
-          signalIds.forEach(signalId => {
-            try {
-              metaWindow.disconnect(signalId)
-            } catch (e) {}
-          })
-        }
-        this.#windowSignalIds.clear()
-        this.#windowSignalIds = null
+    windows.forEach(metaWindow => {
+      const metaWindowActor = metaWindow.get_compositor_private()
+      if (metaWindowActor) {
+        this.#onWindowActorAdded(metaWindowActor.get_parent(), metaWindowActor)
       }
+    })
 
-      if (this.#actorSignalIds) {
-        for (let [actor, signalId] of this.#actorSignalIds.entries()) {
-          try {
-            actor.disconnect(signalId)
-          } catch (e) {}
-        }
-        this.#actorSignalIds.clear()
-        this.#actorSignalIds = null
+    const windowManager = global.window_manager
+    global.display.connect('window-created', (display, metaWindow) => {
+      const metaWindowActor = metaWindow.get_compositor_private()
+      if (metaWindowActor) {
+        this.#onWindowActorAdded(metaWindowActor.get_parent(), metaWindowActor)
       }
-    }
+    })
+  }
 
-    #onWindowActorAdded (container, metaWindowActor) {
-      if (!this.#windowSignalIds) {
-        this.#windowSignalIds = new Map()
-      }
-      if (!this.#actorSignalIds) {
-        this.#actorSignalIds = new Map()
-      }
-
-      const metaWindow = metaWindowActor.get_meta_window()
-
-      if (this.#windowSignalIds.has(metaWindow)) {
-        return
-      }
-
-      const signalIds = []
-
-      signalIds.push(metaWindow.connect('size-changed', () => {
-        this.#updateMaximizedState()
-      }))
-
-      signalIds.push(metaWindow.connect('position-changed', () => {
-        this.#updateMaximizedState()
-      }))
-
-      this.#windowSignalIds.set(metaWindow, signalIds)
-
-      const actorSignalId = metaWindowActor.connect('destroy', () => {
-        this.#onWindowActorRemoved(metaWindow, metaWindowActor)
-      })
-      this.#actorSignalIds.set(metaWindowActor, actorSignalId)
-    }
-
-    #onWindowActorRemoved (metaWindow, metaWindowActor) {
-      if (this.#windowSignalIds && this.#windowSignalIds.has(metaWindow)) {
-        const signalIds = this.#windowSignalIds.get(metaWindow)
+  #cleanupWindowTracking () {
+    if (this.#windowSignalIds) {
+      for (let [metaWindow, signalIds] of this.#windowSignalIds.entries()) {
         signalIds.forEach(signalId => {
           try {
             metaWindow.disconnect(signalId)
           } catch (e) {}
         })
-        this.#windowSignalIds.delete(metaWindow)
       }
-
-      if (this.#actorSignalIds && this.#actorSignalIds.has(metaWindowActor)) {
-        this.#actorSignalIds.delete(metaWindowActor)
-      }
-
-      GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
-        this.#updateMaximizedState()
-        return GLib.SOURCE_REMOVE
-      })
+      this.#windowSignalIds.clear()
+      this.#windowSignalIds = null
     }
 
-    #updateMaximizedState () {
-      const state = this.#detectMaximizedWindow()
-      const wasMaximized = this.#isWindowMaximized
-      this.#isWindowMaximized = state
-
-      if (wasMaximized !== state) {
-        this.#onWallpaperChanged()
-      }
-    }
-
-    #detectMaximizedWindow () {
-      const workspace = global.workspace_manager.get_active_workspace()
-      const windows = workspace.list_windows()
-
-      for (let window of windows) {
-        if (window.is_hidden() || window.minimized) {
-          continue
-        }
-
-        if (!window.get_compositor_private()) {
-          continue
-        }
-
-        if (window.window_type !== Meta.WindowType.NORMAL) {
-          continue
-        }
-
-        const frameRect = window.get_frame_rect()
-        const monitor = Main.layoutManager.primaryMonitor
-
-        if (frameRect.x <= monitor.x &&
-          frameRect.y <= monitor.y &&
-          frameRect.width >= monitor.width &&
-          frameRect.height >= monitor.height) {
-            return true
-          }
-        }
-
-        return false
-      }
-
-      #getWallpaperPath () {
+    if (this.#actorSignalIds) {
+      for (let [actor, signalId] of this.#actorSignalIds.entries()) {
         try {
-          // Detect current color scheme
-          const colorScheme = this.#interfaceSettings.get_string('color-scheme')
-          const isDarkMode = colorScheme === 'prefer-dark'
+          actor.disconnect(signalId)
+        } catch (e) {}
+      }
+      this.#actorSignalIds.clear()
+      this.#actorSignalIds = null
+    }
+  }
 
-          // Use appropriate wallpaper (dark or light)
-          const wallpaperKey = isDarkMode ? BACKGROUND_KEY_DARK : BACKGROUND_KEY
-          let uri = this.#backgroundSettings.get_string(wallpaperKey)
+  #onWindowActorAdded (container, metaWindowActor) {
+    if (!this.#windowSignalIds) {
+      this.#windowSignalIds = new Map()
+    }
+    if (!this.#actorSignalIds) {
+      this.#actorSignalIds = new Map()
+    }
 
-          Logger.debug(this.name, `Color scheme: ${colorScheme}, using ${wallpaperKey}`)
-          Logger.debug(this.name, `Raw URI: ${uri}`)
+    const metaWindow = metaWindowActor.get_meta_window()
 
-          // Remove file:// prefix
-          if (uri.startsWith('file://')) {
-            uri = uri.substring(7)
-          }
+    if (this.#windowSignalIds.has(metaWindow)) {
+      return
+    }
 
-          // Decode URL
-          uri = decodeURIComponent(uri)
+    const signalIds = []
 
-          return uri
-        } catch (e) {
-          Logger.error(`Failed to get wallpaper path: ${e.message}`)
-        }
-        return null
+    signalIds.push(metaWindow.connect('size-changed', () => {
+      this.#updateMaximizedState()
+    }))
+
+    this.#windowSignalIds.set(metaWindow, signalIds)
+
+    const actorSignalId = metaWindowActor.connect('destroy', () => {
+      this.#onWindowActorRemoved(metaWindow, metaWindowActor)
+    })
+    this.#actorSignalIds.set(metaWindowActor, actorSignalId)
+  }
+
+  #onWindowActorRemoved (metaWindow, metaWindowActor) {
+    if (this.#windowSignalIds && this.#windowSignalIds.has(metaWindow)) {
+      const signalIds = this.#windowSignalIds.get(metaWindow)
+      signalIds.forEach(signalId => {
+        try {
+          metaWindow.disconnect(signalId)
+        } catch (e) {}
+      })
+      this.#windowSignalIds.delete(metaWindow)
+    }
+
+    if (this.#actorSignalIds && this.#actorSignalIds.has(metaWindowActor)) {
+      this.#actorSignalIds.delete(metaWindowActor)
+    }
+
+    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+      this.#updateMaximizedState()
+      return GLib.SOURCE_REMOVE
+    })
+  }
+
+  #updateMaximizedState () {
+    const state = this.#detectMaximizedWindow()
+    const wasMaximized = this.#isWindowMaximized
+    this.#isWindowMaximized = state
+
+    if (wasMaximized !== state) {
+      Logger.debug(this.name, `Maximized state changed: ${state}`)
+      this.#onWallpaperChanged()
+    }
+  }
+
+  #detectMaximizedWindow () {
+    const workspace = global.workspace_manager.get_active_workspace()
+    const windows = workspace.list_windows()
+
+    for (let window of windows) {
+      if (window.is_hidden() || window.minimized) {
+        continue
       }
 
-      #onWallpaperChanged () {
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
-          const panelMode = this.#settings.get_string('panel-mode')
-
-          if (panelMode !== 'automatic') {
-            this.#applyStyle(panelMode)
-            return GLib.SOURCE_REMOVE
-          }
-
-          if (this.#isWindowMaximized) {
-            this.#applyStyle('maximized')
-            return GLib.SOURCE_REMOVE
-          }
-
-          const wallpaperPath = this.#getWallpaperPath()
-          if (!wallpaperPath) {
-            this.#applyStyle('light')
-            return GLib.SOURCE_REMOVE
-          }
-
-          // Update file monitor for new wallpaper
-          if (this.#fileMonitor) {
-            this.#fileMonitor.cancel()
-            this.#fileMonitor = null
-          }
-          this.#setupFileMonitor()
-
-          // Use WallpaperAnalyzer service with panel height
-          const threshold = this.#settings.get_double('luminance-threshold')
-          const panelHeight = this.#panel.get_height() || 32
-          const result = WallpaperAnalyzer.analyze(wallpaperPath, threshold, panelHeight)
-
-          this.#applyStyle(result.style)
-
-          return GLib.SOURCE_REMOVE
-        })
+      if (!window.get_compositor_private()) {
+        continue
       }
 
-      #applyStyle (style) {
-        if (this.#currentStyle === style) {
-          return
-        }
-
-        this.#panel.remove_style_class_name('dark')
-        this.#panel.remove_style_class_name('light')
-        this.#panel.remove_style_class_name('translucent-dark')
-        this.#panel.remove_style_class_name('translucent-light')
-        this.#panel.remove_style_class_name('maximized')
-
-        if (style === 'maximized') {
-          this.#panel.add_style_class_name('maximized')
-        } else {
-          this.#panel.add_style_class_name(style)
-        }
-
-        this.#currentStyle = style
+      if (window.window_type !== Meta.WindowType.NORMAL) {
+        continue
       }
 
-      #restoreOriginalStyle () {
-        if (!this.#panel) return
-
-        this.#panel.opacity = 255
-        this.#panel.remove_style_class_name('dark')
-        this.#panel.remove_style_class_name('light')
-        this.#panel.remove_style_class_name('translucent-dark')
-        this.#panel.remove_style_class_name('translucent-light')
-        this.#panel.remove_style_class_name('maximized')
+      // Use Meta's native maximized detection
+      // Returns 3 (Meta.MaximizeFlags.BOTH) when fully maximized
+      if (window.get_maximized() === Meta.MaximizeFlags.BOTH) {
+        Logger.debug(this.name, `Found maximized window: ${window.get_title()}`)
+        return true
       }
     }
+
+    return false
+  }
+
+  #getWallpaperPath () {
+    try {
+      // Detect current color scheme
+      const colorScheme = this.#interfaceSettings.get_string('color-scheme')
+      const isDarkMode = colorScheme === 'prefer-dark'
+
+      // Use appropriate wallpaper (dark or light)
+      const wallpaperKey = isDarkMode ? BACKGROUND_KEY_DARK : BACKGROUND_KEY
+      let uri = this.#backgroundSettings.get_string(wallpaperKey)
+
+      Logger.debug(this.name, `Color scheme: ${colorScheme}, using ${wallpaperKey}`)
+      Logger.debug(this.name, `Raw URI: ${uri}`)
+
+      // Remove file:// prefix
+      if (uri.startsWith('file://')) {
+        uri = uri.substring(7)
+      }
+
+      // Decode URL
+      uri = decodeURIComponent(uri)
+
+      return uri
+    } catch (e) {
+      Logger.error(`Failed to get wallpaper path: ${e.message}`)
+    }
+    return null
+  }
+
+  #onWallpaperChanged () {
+    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+      const panelMode = this.#settings.get_string('panel-mode')
+
+      if (panelMode !== 'automatic') {
+        this.#applyStyle(panelMode)
+        return GLib.SOURCE_REMOVE
+      }
+
+      if (this.#isWindowMaximized) {
+        this.#applyStyle('maximized')
+        return GLib.SOURCE_REMOVE
+      }
+
+      const wallpaperPath = this.#getWallpaperPath()
+      if (!wallpaperPath) {
+        this.#applyStyle('light')
+        return GLib.SOURCE_REMOVE
+      }
+
+      // Update file monitor for new wallpaper
+      if (this.#fileMonitor) {
+        this.#fileMonitor.cancel()
+        this.#fileMonitor = null
+      }
+      this.#setupFileMonitor()
+
+      // Use WallpaperAnalyzer service with panel height
+      const threshold = this.#settings.get_double('luminance-threshold')
+      const panelHeight = this.#panel.get_height() || 32
+      const result = WallpaperAnalyzer.analyze(wallpaperPath, threshold, panelHeight)
+
+      this.#applyStyle(result.style)
+
+      return GLib.SOURCE_REMOVE
+    })
+  }
+
+  #applyStyle (style) {
+    if (this.#currentStyle === style) {
+      return
+    }
+
+    Logger.debug(this.name, `Applying style: ${style}`)
+
+    this.#panel.remove_style_class_name('dark')
+    this.#panel.remove_style_class_name('light')
+    this.#panel.remove_style_class_name('translucent-dark')
+    this.#panel.remove_style_class_name('translucent-light')
+    this.#panel.remove_style_class_name('maximized')
+
+    if (style === 'maximized') {
+      this.#panel.add_style_class_name('maximized')
+    } else {
+      this.#panel.add_style_class_name(style)
+    }
+
+    this.#currentStyle = style
+  }
+
+  #restoreOriginalStyle () {
+    if (!this.#panel) return
+
+    this.#panel.opacity = 255
+    this.#panel.remove_style_class_name('dark')
+    this.#panel.remove_style_class_name('light')
+    this.#panel.remove_style_class_name('translucent-dark')
+    this.#panel.remove_style_class_name('translucent-light')
+    this.#panel.remove_style_class_name('maximized')
+  }
+}
