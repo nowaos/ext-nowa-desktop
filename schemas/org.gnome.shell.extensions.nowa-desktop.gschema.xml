@@ -64,5 +64,17 @@
       <description>Time to switch to dark theme (HH:MM format)</description>
     </key>
 
+    <key name="window-demands-attention-focus" type="b">
+      <default>true</default>
+      <summary>Focus window when it demands attention</summary>
+      <description>Automatically focus windows that demand attention instead of showing notification</description>
+    </key>
+
+    <key name="disable-dash-pin-notifications" type="b">
+      <default>true</default>
+      <summary>Disable dash pin/unpin notifications</summary>
+      <description>Hide notifications when pinning or unpinning applications to dash</description>
+    </key>
+
   </schema>
 </schemalist>

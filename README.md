@@ -1,25 +1,30 @@
 # Nowa Desktop
 
 A complete desktop enhancement extension for GNOME Shell 48, featuring adaptive panel styling,
-rounded corners, automatic theme switching, and live wallpapers.
+interface refinements, automatic theme switching, and live wallpapers.
 
 ## Features
 
-### Adaptive Top Bar
+### Adaptive Panel
 Automatically adjusts panel style based on wallpaper analysis:
 - **Dark mode**: Light panel on dark wallpapers
 - **Light mode**: Dark panel on light wallpapers
 - **Translucent modes**: Semi-transparent with blur
 - **Maximized mode**: Solid black when window is maximized
 
-### Rounded Corners
-macOS-style rounded screen corners with configurable radius (0-32px).
+### Interface Refinements
+Fine-tuned adjustments for a cleaner desktop experience:
+- **Rounded corners**: Smooth screen corners for modern aesthetics
+- **Reduced clutter**: Redundant UI elements removed
+- **Smart notifications**: Suppresses unnecessary system notifications
+  - Auto-focus windows instead of showing "ready" notifications
+  - Hides pin/unpin dashboard notifications
 
-### Auto Theme Switcher
-Automatically switches between light/dark themes based on sunrise/sunset times:
-- Configure custom times (HH:MM format)
+### Light/Dark Theme Scheduling
+Automatically switches between light and dark themes based on time of day:
+- Configure sunrise and sunset times
+- Seamless transitions at scheduled times
 - Respects manual theme changes
-- Only switches at transition times
 
 ### Live Wallpaper
 Daily wallpapers from Unsplash:

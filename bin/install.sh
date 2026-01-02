@@ -41,6 +41,7 @@ cp -r "$PROJECT_ROOT/modules" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/services" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/utils" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/prefs" "$EXTENSION_DIR/"
+cp -r "$PROJECT_ROOT/interfaces" "$EXTENSION_DIR/"
 cp -r "$PROJECT_ROOT/assets" "$EXTENSION_DIR/"
 
 # Step 4: Copy and compile schema
