@@ -5,13 +5,6 @@ interface refinements, automatic theme switching, and live wallpapers.
 
 ## Features
 
-### Adaptive Panel
-Automatically adjusts panel style based on wallpaper analysis:
-- **Dark mode**: Light panel on dark wallpapers
-- **Light mode**: Dark panel on light wallpapers
-- **Translucent modes**: Semi-transparent with blur
-- **Maximized mode**: Solid black when window is maximized
-
 ### Interface Refinements
 Fine-tuned adjustments for a cleaner desktop experience:
 - **Rounded corners**: Smooth screen corners for modern aesthetics

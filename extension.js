@@ -3,7 +3,6 @@
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js'
 
-import { AdaptivePanel } from './src/modules/AdaptivePanel.js'
 import { RoundedCorners } from './src/modules/RoundedCorners.js'
 import { ThemeSwitcher } from './src/modules/ThemeSwitcher.js'
 import { LiveWallpaper } from './src/modules/LiveWallpaper.js'
@@ -14,10 +13,10 @@ import { Logger } from './src/services/Logger.js'
 * Nowa Desktop - A complete desktop enhancement extension
 *
 * Features:
-* - Adaptive top bar based on wallpaper analysis
 * - Rounded screen corners
 * - Automatic theme switching (sunrise/sunset)
 * - Live wallpaper from Unsplash
+* - Shell interface tweaks
 */
 export default class NowaDesktopExtension extends Extension {
   #modules = []
@@ -29,7 +28,6 @@ export default class NowaDesktopExtension extends Extension {
 
     // Initialize all modules
     this.#modules = [
-      new AdaptivePanel(settings),
       new RoundedCorners(settings, this.dir),
       new ThemeSwitcher(settings),
       new LiveWallpaper(settings),

@@ -2,26 +2,6 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.nowa-desktop" path="/org/gnome/shell/extensions/nowa-desktop/">
 
-    <key name="panel-mode" type="s">
-      <default>'automatic'</default>
-      <summary>Panel mode</summary>
-      <description>Panel appearance mode: automatic, dark, light, translucent-dark, translucent-light</description>
-      <choices>
-        <choice value='automatic'/>
-        <choice value='dark'/>
-        <choice value='light'/>
-        <choice value='translucent-dark'/>
-        <choice value='translucent-light'/>
-      </choices>
-    </key>
-
-    <key name="luminance-threshold" type="d">
-      <default>0.575</default>
-      <summary>Luminance threshold</summary>
-      <description>Threshold to determine if background is dark or light (0.0 to 1.0)</description>
-      <range min="0.0" max="1.0"/>
-    </key>
-
     <key name="enable-live-wallpaper" type="b">
       <default>false</default>
       <summary>Enable live wallpaper</summary>
