@@ -56,5 +56,11 @@
       <description>Hide notifications when pinning or unpinning applications to dash</description>
     </key>
 
+    <key name="enable-dash-to-dock-tweaks" type="b">
+      <default>false</default>
+      <summary>Enable Dash to Dock tweaks</summary>
+      <description>Simplify Dash to Dock appearance with cleaner styling</description>
+    </key>
+
   </schema>
 </schemalist>

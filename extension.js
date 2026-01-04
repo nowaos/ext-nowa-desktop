@@ -7,6 +7,7 @@ import { RoundedCorners } from './src/modules/RoundedCorners.js'
 import { ThemeSwitcher } from './src/modules/ThemeSwitcher.js'
 import { LiveWallpaper } from './src/modules/LiveWallpaper.js'
 import { ShellTweaks } from './src/modules/ShellTweaks.js'
+import { DashToDockTweaks } from './src/modules/DashToDockTweaks.js'
 import { Logger } from './src/services/Logger.js'
 
 /**
@@ -32,6 +33,7 @@ export default class NowaDesktopExtension extends Extension {
       new ThemeSwitcher(settings),
       new LiveWallpaper(settings),
       new ShellTweaks(settings),
+      new DashToDockTweaks(settings, this.dir),
     ]
 
     // Enable all modules

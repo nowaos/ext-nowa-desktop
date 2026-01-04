@@ -13,6 +13,28 @@ export class DesktopPrefs {
       icon_name: 'video-display-symbolic',
     })
 
+    // === DASH TO DOCK GROUP ===
+    const dashToDockGroup = new Adw.PreferencesGroup({
+      title: 'Dash to Dock',
+      description: 'Simplified appearance for Dash to Dock extension',
+    })
+
+    const dashTweaksRow = new Adw.SwitchRow({
+      title: 'Simplify Dash to Dock',
+      subtitle: 'Cleaner design: translucent background, no hover effects',
+    })
+
+    settings.bind(
+      'enable-dash-to-dock-tweaks',
+      dashTweaksRow,
+      'active',
+      0 // Gio.SettingsBindFlags.DEFAULT
+    )
+
+    dashToDockGroup.add(dashTweaksRow)
+
+    page.add(dashToDockGroup)
+
     // === NOTIFICATIONS GROUP ===
     const notificationsGroup = new Adw.PreferencesGroup({
       title: 'Notifications',
